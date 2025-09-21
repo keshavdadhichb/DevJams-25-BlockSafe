@@ -10,14 +10,17 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.893.0",
     "@prisma/client": "^6.16.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "google-auth-library": "^10.3.0",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2"
   },
   "devDependencies": {
+    "@types/multer": "^2.0.0",
     "prisma": "^6.16.2"
   }
 }
