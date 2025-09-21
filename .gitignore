@@ -1,5 +1,3 @@
-
-/generated/prisma
 # ## Dependencies ##
 # The node_modules folder contains all the installed packages.
 # It can be very large and should always be re-created by running `npm install`.
