@@ -1,0 +1,11 @@
+•	The input video stream is divided into fixed-size clips (e.g., 16 frames), sampled at constant frame rates.
+•	Each clip goes through a 3D convolutional network (ResNet3D, e.g., R3D-18) that extracts spatiotemporal features, capturing appearance and motion cues.
+•	At the same time, audio data is processed using a pretrained speech model (e.g., Wav2Vec2), which extracts acoustic features and classifies vocalizations (e.g., screams).
+•	Video features are further examined by an LSTM-autoencoder to model temporal dependencies and detect anomalies based on reconstruction loss.
+•	The outputs from audio and video classifications produce confidence scores for categories like “crime” or “no crime.”
+•	These scores are combined in a fusion function that applies weighted aggregation for a complete understanding of the scene and informed decision-making.
+•	If the combined confidence exceeds a set threshold indicating suspicious activity, the pipeline outputs “crime detected.”
+•	Otherwise, it categorizes the environment as “no crime.”
+•	The final analyze_video function in the GuardianAI pipeline plays an essential role in bringing together the outputs from various model components to provide a clear judgement on safety.
+•	Confirmed crime detections trigger alerts and start secure logging of related multimedia evidence on a blockchain to ensure tamper- proof documentation.
+•	This multi-model pipeline ensures reliable real-time crime classification by using complementary audio-visual cues and effective temporal modeling within an integrated decision framework
