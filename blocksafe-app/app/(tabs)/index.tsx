@@ -165,51 +165,70 @@ function AppContent() {
     }
   };
 
-  const sendTwilioAlert = async (): Promise<void> => {
+  // This new function handles both SMS and the AI Voice Call
+  const triggerEmergencyAlerts = async (): Promise<void> => {
     if (!location) {
-      Alert.alert("Location Error", "Cannot send alert without user location.");
-      return;
+        Alert.alert("Location Error", "Cannot send alert without user location.");
+        return;
     }
 
     setStatusText('Notifying emergency contact...');
-    
-    // [FIX] Correctly format the Google Maps URL
-    const locationUrl = `https://www.google.com/maps?q=${location.coords.latitude},${location.coords.longitude}`;
-    
-    const message = `EMERGENCY: A distress signal was detected by BlockSafe. Location: ${locationUrl}`;
-    const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${process.env.EXPO_PUBLIC_TWILIO_ACCOUNT_SID}/Messages.json`;
-    const encodedCredentials = Buffer.from(`${process.env.EXPO_PUBLIC_TWILIO_ACCOUNT_SID}:${process.env.EXPO_PUBLIC_TWILIO_AUTH_TOKEN}`).toString('base64');
-   
-    const body = new URLSearchParams({
-      'To': process.env.EXPO_PUBLIC_EMERGENCY_CONTACT_PHONE_NUMBER || '',
-      'From': process.env.EXPO_PUBLIC_TWILIO_PHONE_NUMBER || '',
-      'Body': message,
-    }).toString();
 
+    // --- 1. Send SMS (Existing Logic) ---
     try {
-      await fetch(twilioUrl, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Basic ${encodedCredentials}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body,
-      });
-      console.log(`
-    ┌──────────────────────────────────────────┐
-    │ 🚨 Twilio Alert Sent                     │
-    ├──────────────────────────────────────────┤
-    │ ✅ Emergency contact has been notified.  │
-    └──────────────────────────────────────────┘
-      `);
-      Alert.alert('Alert Sent', 'Your emergency contact has been notified.');
-      setStatusText('Emergency contact notified');
+        const locationUrl = `https://www.google.com/maps?q=${location.coords.latitude},${location.coords.longitude}`;
+        const message = `EMERGENCY: A distress signal was detected by BlockSafe. Location: ${locationUrl}`;
+        const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${process.env.EXPO_PUBLIC_TWILIO_ACCOUNT_SID}/Messages.json`;
+        const encodedCredentials = Buffer.from(`${process.env.EXPO_PUBLIC_TWILIO_ACCOUNT_SID}:${process.env.EXPO_PUBLIC_TWILIO_AUTH_TOKEN}`).toString('base64');
+        
+        const body = new URLSearchParams({
+            'To': process.env.EXPO_PUBLIC_EMERGENCY_CONTACT_PHONE_NUMBER || '',
+            'From': process.env.EXPO_PUBLIC_TWILIO_PHONE_NUMBER || '',
+            'Body': message,
+        }).toString();
+
+        await fetch(twilioUrl, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Basic ${encodedCredentials}`,
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body,
+        });
+        console.log('✅ Twilio SMS sent successfully.');
     } catch (error) {
-      console.error('CRITICAL: Twilio SMS failed:', error);
-      Alert.alert('SMS Error', 'Failed to send emergency SMS.');
-      setStatusText('SMS failed to send');
+        console.error('CRITICAL: Twilio SMS failed:', error);
+        Alert.alert('SMS Error', 'Failed to send emergency SMS.');
     }
+
+    // --- 2. Trigger AI Voice Call (New Logic) ---
+    try {
+        // This constructs the URL to your new backend endpoint
+        const backendCallUrl = `${API_URL.replace('/api/upload', '')}/api/make-call`; 
+
+        await axios.post(backendCallUrl, {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+        });
+        
+        console.log(`
+    ┌──────────────────────────────────────────┐
+    │ 📞 AI Voice Call Initiated               │
+    ├──────────────────────────────────────────┤
+    │ ✅ Backend acknowledged the request.     │
+    └──────────────────────────────────────────┘
+        `);
+
+    } catch (error) {
+        console.error('CRITICAL: AI call trigger failed:', error);
+        Alert.alert('Call Error', 'Failed to trigger emergency call.');
+    }
+
+    // Update status after both attempts
+    Alert.alert('Alert Sent', 'Your emergency contact has been notified via SMS and a voice call.');
+    setStatusText('Emergency contact notified');
   };
+
 
   const handleFileUpload = async (uri: string | null): Promise<void> => {
     if (!uri) {
@@ -264,7 +283,8 @@ function AppContent() {
           "Distress signal detected. Notifying emergency services and contact.",
           [{ text: "OK", style: "default" }]
         );
-        await sendTwilioAlert();
+        // Call the new alert function that handles both SMS and Voice
+        await triggerEmergencyAlerts();
       } else if (geminiAnalysis.toLowerCase().includes('warning')) {
         Alert.alert(
           "⚠️ Warning",
