@@ -12,6 +12,6 @@ The features that we have successfully executed are -
 4. A fully functioning unique non-contact SOS app that redefines SOS services
 5. A convienient Agentic service that makes a call and explains the distress information to the authorities and the emergency contact
 
-
+All screenshots have been attached in the file below
 
 https://docs.google.com/document/d/1WfmIPXpXNVOTVStNf3fv3M8miY7ETG6beBJtJ_J3vK8/edit?usp=sharing
