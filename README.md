@@ -1,7 +1,7 @@
 Happy late night, GDG people.
 This is our official submission for DevJams'25.
 
-checkout model branch to see the AI models
+->->->->checkout model branch to see the AI models<-<-<-<-
 
 I know you guys have heard it many times but - 
 BlockSafe is a proactive platform for everyone's safety and crime detection. It uses blockchain-certified evidence storage integrated with AWS S3 Storage to offer tamper-proof, real-time protection and documentation of incidents for people in high-risk situations.
